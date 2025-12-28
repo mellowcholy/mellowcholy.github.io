@@ -23,8 +23,7 @@ await $.get("https://ddragon.leagueoflegends.com/api/versions.json", function(da
 	version = data[0];
 });
 
-// setup champ icons
-//$.get('champion.json', function(data) {
+// setup champ data
 const champRequests = [];
 
 await $.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`, function (data) {
@@ -46,6 +45,12 @@ await $.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champ
     }
 });
 
+// skinlines
+let skinlines;
+await $.get(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/skinlines.json`, function (data) {
+	skinlines = data;
+});
+
 const results = await Promise.all(champRequests);
 
 $("#loading").css("display","none");
@@ -61,8 +66,8 @@ for (const { rawData, champData, rawTags, key } of results) {
 
     champList[name] = {
         class: champData.roles,
-        skins: champData.skins,
         range: rawData.stats.attackrange,
+		skins: [],
     };
 
 	for (const k in rawTags) {
@@ -70,9 +75,21 @@ for (const { rawData, champData, rawTags, key } of results) {
 		break;
 	}
 
-	console.log(champList[name]);
-}
+	for (const skin in champData.skins) {
+		for (const line in champData.skins[skin].skinLines) {
+			const skinlineId = champData.skins[skin].skinLines[line].id;
 
+			skinlines.forEach((element) => {
+				if (element.id == skinlineId) {
+					champList[name].skins.push(element.name);
+				}
+			});
+		}
+	}
+
+	//console.log(name);
+	//console.log(champList[name]);
+}
 
 function SetChamps(list1, list2) {
 	if (list2 == null) { team2.css("display","none"); }
@@ -106,7 +123,6 @@ function GetTag(key, tag) {
 
 	return key.tags[tag];
 }
-
 // setup option buttons
 let options = {
 	"letters": {
@@ -143,9 +159,9 @@ let options = {
 			SetChamps(c);
 		}
 	},
-	"genders": {
+	"genders+race": {
 		type: "title",
-		text: "Genders",
+		text: "Genders/Race",
 	},
 	"male": {
 		type: "option",
@@ -189,6 +205,20 @@ let options = {
 			}
 
 			SetChamps(m, f);
+		}
+	},
+	"humans&everythingelse": {
+		type: "option",
+		text: "Humans vs Everything Else",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (GetTag(champList[key], "race") == "human") { a.push(key); } else { b.push(key); }
+			}
+
+			SetChamps(a, b);
 		}
 	},
 	"regions": {
@@ -325,7 +355,6 @@ let options = {
 		type: "title",
 		text: "Classes",
 	},
-	// TODO: vvvv
 	"marksmen,support&mages": {
 		type: "option",
 		text: "Marksmen & Support vs Mages",
@@ -366,6 +395,96 @@ let options = {
 			SetChamps(a, b);
 		}
 	},
+	"fighters": {
+		type: "option",
+		text: "Fighters",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("fighter")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"mages": {
+		type: "option",
+		text: "Mages",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("mage")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"assassins": {
+		type: "option",
+		text: "Assassins",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("assassin")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"marksmen": {
+		type: "option",
+		text: "Marksmen",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("marksman")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"tanks": {
+		type: "option",
+		text: "Tanks",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("tank")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"supports": {
+		type: "option",
+		text: "Supports",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (champList[key].class.includes("support")) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
 	"skinlines": {
 		type: "title",
 		text: "Skinlines",
@@ -374,14 +493,229 @@ let options = {
 		type: "option",
 		text: "Spirit Blossom vs Blood Moon",
 		champs() {
-			SetChamps(tags.spiritblossom, tags.bloodmoon);
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (champList[key].skins.includes("Spirit Blossom")) {
+					a.push(key);
+				}
+
+				if (champList[key].skins.includes("Blood Moon")) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
 		}
 	},
 	"christmas&halloween": {
 		type: "option",
 		text: "Christmas vs Halloween",
 		champs() {
-			SetChamps(tags.christmas, tags.halloween);
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Sugar Rush") ||
+					champList[key].skins.includes("Toy Box") ||
+					champList[key].skins.includes("Winterblessed") ||
+					champList[key].skins.includes("Snowdown Showdown") ||
+					champList[key].skins.includes("Snow Day") ||
+					champList[key].skins.includes("Winter Wonder")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("Academy") ||
+					champList[key].skins.includes("Bewitching") ||
+					champList[key].skins.includes("Zombies VS Slayers") ||
+					champList[key].skins.includes("Definitely Not") ||
+					champList[key].skins.includes("Demonic") ||
+					champList[key].skins.includes("Fright Night") ||
+					champList[key].skins.includes("Death Sworn") ||
+					champList[key].skins.includes("La Ilusión") ||
+					champList[key].skins.includes("Trick-or-Treat")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
+		}
+	},
+	"music": {
+		type: "option",
+		text: "KDA/Heartsteel/True Damage/Pentakill",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("K/DA") ||
+					champList[key].skins.includes("HEARTSTEEL") ||
+					champList[key].skins.includes("True Damage") ||
+					champList[key].skins.includes("Pentakill") ||
+					champList[key].skins.includes("Pentakill III: The Lost Chapter")
+				) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"newyears&valentines": {
+		type: "option",
+		text: "New Years vs Valentines",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Lunar Revel") ||
+					champList[key].skins.includes("Lunar Revel: Firecracker") ||
+					champList[key].skins.includes("Lunar Beast") ||
+					champList[key].skins.includes("Mythmaker")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("Debonair") ||
+					champList[key].skins.includes("Heartbreakers")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
+		}
+	},
+	"coven&starguardian": {
+		type: "option",
+		text: "Coven vs Star Guardians",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Coven")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("Star Guardian Season 1") ||
+					champList[key].skins.includes("Star Guardian Season 2") ||
+					champList[key].skins.includes("Star Guardian Season 3") ||
+					champList[key].skins.includes("Star Guardian Season 4")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
+		}
+	},
+	"poolparty&infernal": {
+		type: "option",
+		text: "Pool Party vs Infernal",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Pool Party")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("Infernal")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
+		}
+	},
+	"night/dawnbringers&cosmic/darkstar": {
+		type: "option",
+		text: "Night/Dawnbringers vs Cosmic/Dark Star",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Nightbringer") ||
+					champList[key].skins.includes("Dawnbringer") ||
+					champList[key].skins.includes("Nightbringer and Dawnbringer")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("Cosmic") ||
+					champList[key].skins.includes("Dark Star")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
+		}
+	},
+	"dayjob/arcade/bees": {
+		type: "option",
+		text: "Day Job/Arcade/Bees",
+		champs() {
+			let c = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Day Job") ||
+					champList[key].skins.includes("Arcade: Heroes") ||
+					champList[key].skins.includes("Arcade: Battle Bosses") ||
+					champList[key].skins.includes("Bees!")
+				) {
+					c.push(key);
+				}
+			}
+
+			SetChamps(c);
+		}
+	},
+	"elderwood/animasquad&project": {
+		type: "option",
+		text: "Elderwood/Anima Squad vs Project",
+		champs() {
+			let a = Array();
+			let b = Array();
+
+			for (const key in champList) {
+				if (
+					champList[key].skins.includes("Elderwood") ||
+					champList[key].skins.includes("Anima Squad")
+				) {
+					a.push(key);
+				}
+
+				if (
+					champList[key].skins.includes("PROJECT")
+				) {
+					b.push(key);
+				}
+			}
+
+			SetChamps(a, b);
 		}
 	},
 	"other": {
@@ -395,7 +729,7 @@ let options = {
 			let c = Array();
 
 			for (const key in champList) {
-				if (champList[key].stats.attackrange > 325) {
+				if (champList[key].range > 325) {
 					c.push(key);
 				}
 			}
@@ -410,7 +744,7 @@ let options = {
 			let c = Array();
 
 			for (const key in champList) {
-				if (champList[key].stats.attackrange <= 325) {
+				if (champList[key].range <= 325) {
 					c.push(key);
 				}
 			}
@@ -420,31 +754,16 @@ let options = {
 	},
 	"stack": {
 		type: "option",
-		text: "Infinite Stacking",
+		text: "Stackin'",
 		champs() {
 			SetChamps(tags.infinite);
 		}
 	},
 	"nemesis": {
 		type: "option",
-		text: "Nemesis Draft",
+		text: "Side Quest",
 		champs() {
 			SetChamps(tags.nemesis);
-		}
-	},
-	"crimecitytest": {
-		type: "option",
-		text: "CrimeCity",
-		champs() {
-			let c = Array();
-
-			for (const key in champList) {
-				if (champList[key].stats.attackrange <= 325) {
-					c.push(key);
-				}
-			}
-
-			SetChamps(c);
 		}
 	},
 }
@@ -494,9 +813,4 @@ for (const key in floating) {
 let tags = {
 	"infinite": ["Aurelion Sol","Bard","Bel'Veth","Cho'Gath","Draven","Kindred","Nasus","Senna","Shyvana","Sion","Smolder","Swain","Sylas","Thresh","Veigar"],
 	"nemesis": ["Rengar","Kha'Zix","Senna","Lucian","Thresh","Hwei","Jhin","Nasus","Renekton","Shen","Zed","Bel'Veth","Jax","Aurelion Sol","Smolder","Kindred","Tryndamere","Kayle","Morgana","Aatrox"],
-	//-----
-	"spiritblossom": ["Ahri","Aphelios","Cassiopeia","Darius","Evelynn","Kindred","Lillia","Master Yi","Riven","Sett","Soraka","Syndra","Teemo","Thresh","Tristana","Vayne","Yasuo","Yone","Yorick"],
-	"bloodmoon": ["Aatrox","Akali","Diana","Elise","Evelynn","Fiddlesticks","Jhin","Kalista","Katarina","Kennen","Master Yi","Pyke","Shen","Sivir","Talon","Thresh","Tryndamere","Twisted Fate","Yasuo","Zed","Zilean","Zyra"],
-	"christmas": ["Bard","Gnar","Graves","Malzahar","Singed","Syndra","Ziggs","Jinx","Veigar","Miss Fortune","Tristana","Maokai","Teemo","LeBlanc","Shaco","Zilean","Amumu","Kog'Maw","Braum","Draven","Gragas","Sona","Katarina","Nidalee","Heimerdinger","Nunu & Willump","Irelia","Annie","Dr. Mundo","Twitch","Sejuani","Poppy","Master Yi","Sivir","Karma","Lulu","Neeko","Orianna","Soraka"],
-	"halloween": ["Annie","Draven","Nautilus","Nunu & Willump","Pyke","Renata Glasc","Shaco","Trundle","Urgot","Veigar","Zeri","Cassiopeia","Elise","Fiora","Janna","LeBlanc","Miss Fortune","Morgana","Nami","Neeko","Nidalee","Poppy","Senna","Syndra","Tristana","Yuumi","Anivia","Urgot","Kassadin","Kled","Karthus","Maokai","Zyra","Nocturne","Hecarim","Katarina","Dr. Mundo","Tryndamere","Vladimir","Amumu","Fiddlesticks","Gangplank","Ekko","Twisted Fate","Vayne","Lulu","Blitzcrank"],
 }

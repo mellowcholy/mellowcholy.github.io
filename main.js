@@ -48,6 +48,8 @@ await $.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champ
 
 const results = await Promise.all(champRequests);
 
+$("#loading").css("display","none");
+
 for (const { rawData, champData, rawTags, key } of results) {
     const name = champData.name;
 

@@ -8,6 +8,19 @@
   	<link rel="icon" type="image/x-icon" href="icon.png">
 	<script src="jquery.js"></script>
 	<script src="main.js"></script>
+	<script>
+		$(document).ready(function() {
+			const tooltip = $("#tooltip");
+			tooltip.hide();
+
+			$(document).on('mousemove', function(e){
+				tooltip.css('top', e.pageY + 8);
+				tooltip.css('left', e.pageX + 8);
+			});
+		});
+
+		
+	</script>
   </head>
   <body>
 	<pre class="floating" style="right:230px;bottom:50px">
@@ -38,5 +51,7 @@
 		<div id="team2" class="team" style="display:none;">
 		</div>
 	</div>
+
+	<div id="tooltip"></div>
   </body>
 </html>

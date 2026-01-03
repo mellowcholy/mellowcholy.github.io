@@ -115,3 +115,14 @@ body {
 
 	z-index: -5;
 }
+
+#tooltip {
+	position: absolute;
+
+	border: solid 1px white;
+
+	padding: 4px;
+
+	background-color: black;
+	color: white;
+}

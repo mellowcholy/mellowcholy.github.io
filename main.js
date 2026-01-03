@@ -55,11 +55,26 @@ const results = await Promise.all(champRequests);
 
 $("#loading").css("display","none");
 
+const tooltip = $("#tooltip");
+
 for (const { rawData, champData, rawTags, key } of results) {
     const name = champData.name;
 
-    const c1 = $(`<img class="champ" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${key}.png">`).appendTo(team1);
-    const c2 = $(`<img class="champ" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${key}.png">`).appendTo(team2);
+    const c1 = $(`<img class="champ ${key}" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${key}.png">`).appendTo(team1);
+    const c2 = $(`<img class="champ ${key}" src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${key}.png">`).appendTo(team2);
+
+	$("." + key).on({
+		mouseenter: function() {
+			tooltip.show();
+			tooltip.html(`[${name}]`);
+
+			if (name == "Caitlyn") { tooltip.html(`[${name}] ♡`); }
+		},
+		mouseleave: function() {
+			tooltip.hide();
+			tooltip.html("");
+		}
+	});
 
     champs1[name] = c1;
     champs2[name] = c2;

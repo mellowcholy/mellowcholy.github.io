@@ -61,4 +61,49 @@ function renderPlayer(player) {
 			{ label: "Games lost", value: played - won },
 		],
 	}, true);
+	const results = view.find(".group-title").filter(function () {
+		return $(this).text() === "Results";
+	}).closest(".stat-group");
+	renderFavouriteItems(player, results);
+}
+
+const trinkets = { "3340": true, "3363": true, "3364": true };
+
+function renderFavouriteItems(player, after) {
+	const favourites = favouriteItems(player).slice(0, 8);
+	if (!favourites.length) return;
+	const group = $("<div class='stat-group favourite-items'>");
+	if (after && after.length) group.insertAfter(after);
+	else group.appendTo(site.view);
+	$("<span class='group-title'>").text("Favourite Items").appendTo(group);
+	const row = $("<div class='champ-row'>").appendTo(group);
+	favourites.forEach(function (entry) {
+		const image = icon(entry.item, "champ item");
+		image.on("mouseenter", function () {
+			showTip(entry.item.name + " × " + entry.count);
+		});
+		image.on("mouseleave", hideTip);
+		row.append(image);
+	});
+}
+
+function favouriteItems(player) {
+	const counts = {};
+	player.games.forEach(function (game) {
+		const seen = {};
+		(game.items || []).forEach(function (item) {
+			if (!item || !item.name || item.placeholder) return;
+			if (trinkets[item.key] || trinkets[item.externalKey]) return;
+			const key = item.key || item.name;
+			if (seen[key]) return;
+			seen[key] = true;
+			if (!counts[key]) counts[key] = { item: item, count: 0 };
+			counts[key].count += 1;
+		});
+	});
+	return Object.keys(counts).map(function (key) {
+		return counts[key];
+	}).sort(function (a, b) {
+		return b.count - a.count || a.item.name.localeCompare(b.item.name);
+	});
 }

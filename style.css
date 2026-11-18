@@ -158,6 +158,8 @@ body {
 .item {
 	width: 32px;
 	height: 32px;
+	margin-top: 11px;
+	margin-left: 8px;
 }
 
 .outlined {
@@ -295,6 +297,11 @@ table.board img {
 	margin: 4px;
 	border: 1px solid grey;
 	box-sizing: border-box;
+}
+
+.stats.packed .favourite-items {
+	width: 100%;
+	margin: 0;
 }
 
 .group-title {

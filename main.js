@@ -94,7 +94,6 @@ $(document).ready(async function () {
 		}
 		$("<span class='muted'>").text(
 			player.games.length + " games · series " + player.seriesWins + "-" + player.seriesLosses
-			+ " · stats are played games only"
 		).appendTo(who);
 
 		const champions = $("<div class='champ-row'>").appendTo(view);
@@ -174,9 +173,7 @@ $(document).ready(async function () {
 			return match.outcome === "FORFEIT";
 		});
 		$("<span class='muted'>").text(
-			"Series " + team.seriesWins + "-" + team.seriesLosses
-			+ " · " + team.games.length + " games"
-			+ (skipped ? " · forfeit series are counted, played stats are not" : "")
+			"Series " + team.seriesWins + "-" + team.seriesLosses + " · " + team.games.length + " games"
 		).appendTo(view);
 
 		$("<span class='section-label'>").text("Matches").appendTo(view);
@@ -186,7 +183,7 @@ $(document).ready(async function () {
 			const line = $("<div class='match-line'>").appendTo(view);
 			$("<div>").text(
 				(match.stageName || "Match")
-				+ " · vs " + (other ? other.name : "TBD")
+				+ " vs " + (other ? other.name : "TBD")
 				+ " · " + (side.score == null ? "" : side.score + "-" + (other && other.score != null ? other.score : "?"))
 				+ " · " + seriesLabel(side, match.outcome)
 				+ (match.playedAt ? " · " + formatWhen(match.playedAt) : "")

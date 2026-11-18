@@ -60,5 +60,5 @@ function renderPlayer(player) {
 			{ label: "Games won", value: won },
 			{ label: "Games lost", value: played - won },
 		],
-	});
+	}, true);
 }

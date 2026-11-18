@@ -4,8 +4,15 @@ var site = {
 	tooltip: null,
 };
 
-function renderStatGroups(scope, values, parent, extras) {
+function renderStatGroups(scope, values, parent, extras, packed) {
 	const host = $("<div class='stats'>").appendTo(parent || site.view);
+	const columns = [];
+	if (packed) {
+		host.addClass("packed");
+		columns.push($("<div class='stat-col'>").appendTo(host));
+		columns.push($("<div class='stat-col'>").appendTo(host));
+	}
+	let column = 0;
 	const groups = {};
 	site.model.definitions.filter(function (definition) {
 		return definition.scope === scope && definition.kind !== "ATTRIBUTE";
@@ -17,7 +24,8 @@ function renderStatGroups(scope, values, parent, extras) {
 		groups[name].push(definition);
 	});
 	Object.keys(groups).forEach(function (name) {
-		const group = $("<div class='stat-group'>").appendTo(host);
+		const group = $("<div class='stat-group'>").appendTo(packed ? columns[column % 2] : host);
+		column += 1;
 		$("<span class='group-title'>").text(name).appendTo(group);
 		groups[name].sort(function (a, b) {
 			return (a.position || 0) - (b.position || 0);

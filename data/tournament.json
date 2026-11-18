@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-18T01:38:22Z",
+  "fetchedAt": "2026-11-18T08:14:28Z",
   "competitionId": "248e73e3-1cb8-4d50-b17b-a495c449b1f8",
   "competitionName": "UCGGLoL Summer Showdown '26",
   "definitions": [
@@ -2060,7 +2060,7 @@
           "slot": 1,
           "entrantId": "af67971a-6042-4c5f-9478-823a39d5d68f",
           "name": "Kurdish Cookout",
-          "logoUrl": null,
+          "logoUrl": "https://media.ezmode.gg/teams/af67971a-6042-4c5f-9478-823a39d5d68f/logo/4c96e222-5e8e-4c94-a32c-d703868c337d.jpg",
           "score": 0,
           "result": "LOSS",
           "winner": false
@@ -6025,7 +6025,7 @@
           "slot": 2,
           "entrantId": "7b0b88fe-d55b-43ab-b9a7-a7f7ec0e2350",
           "name": "The Bald and the Beautiful",
-          "logoUrl": null,
+          "logoUrl": "https://media.ezmode.gg/teams/7b0b88fe-d55b-43ab-b9a7-a7f7ec0e2350/logo/8f8e60f4-d4be-4dfc-a428-461e09adff4d.jpg",
           "score": 2,
           "result": "WIN",
           "winner": true

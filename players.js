@@ -51,7 +51,6 @@ function renderPlayer(player) {
 	headlineStat(headline, "VS/m", formatStat("PLAYER", "vision_per_minute", totals.vision_per_minute));
 	headlineStat(headline, "Win rate", formatStat("PLAYER", "win_rate", totals.win_rate));
 
-	$("<span class='section-label'>").text("Season").appendTo(view);
 	const played = totals.games || 0;
 	const won = totals.wins || 0;
 	renderStatGroups("PLAYER", totals, null, {

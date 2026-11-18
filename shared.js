@@ -213,6 +213,7 @@ function buildModel(snapshot) {
 					opponentName: opponentName(match, teamLine.slot),
 					sideName: firstRefName(teamLine.attributes, "side"),
 					stats: teamLine.stats || {},
+					bans: (teamLine.attributes && teamLine.attributes.bans) || [],
 					roster: roster,
 				});
 			});
@@ -339,7 +340,6 @@ function teamDerived(totals) {
 		dragons_per_game: totals.games ? (totals.dragon_kills || 0) / totals.games : 0,
 		barons_per_game: totals.games ? (totals.baron_kills || 0) / totals.games : 0,
 		towers_per_game: totals.games ? (totals.tower_kills || 0) / totals.games : 0,
-		first_blood_rate: totals.games ? (totals.first_blood || 0) / totals.games * 100 : 0,
 		first_tower_rate: totals.games ? (totals.first_tower || 0) / totals.games * 100 : 0,
 		first_dragon_rate: totals.games ? (totals.first_dragon || 0) / totals.games * 100 : 0,
 		win_rate: totals.games ? totals.wins / totals.games * 100 : 0,

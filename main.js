@@ -44,14 +44,6 @@ $(document).ready(async function () {
 
 		view.empty();
 		view.scrollTop(0);
-		const selected = $(".option.selected");
-		if (selected.length) {
-			const row = selected.get(0);
-			const pane = left.get(0);
-			if (row.offsetTop < pane.scrollTop || row.offsetTop > pane.scrollTop + pane.clientHeight - 40) {
-				pane.scrollTop = Math.max(0, row.offsetTop - 80);
-			}
-		}
 		if (hash === "teams") {
 			renderTeams();
 			return;

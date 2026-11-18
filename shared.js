@@ -32,6 +32,19 @@ function renderStatGroups(scope, values, parent) {
 	});
 }
 
+function playerName(name) {
+	const text = name || "";
+	const hash = text.indexOf("#");
+	const wrap = $("<span class='player-name'>");
+	if (hash === -1) {
+		$("<b>").text(text).appendTo(wrap);
+		return wrap;
+	}
+	$("<b>").text(text.slice(0, hash)).appendTo(wrap);
+	$("<span class='tag'>").text(text.slice(hash)).appendTo(wrap);
+	return wrap;
+}
+
 function headlineStat(parent, label, value) {
 	const box = $("<div>").appendTo(parent);
 	$("<b>").text(label).appendTo(box);

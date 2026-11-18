@@ -10,7 +10,9 @@ function renderPlayers() {
 			bindChampionTip(image, champion.name);
 			line.append(image);
 		}
-		$("<span>").text(player.name + (player.teamName ? " · " + player.teamName : "")).appendTo(line);
+		const label = $("<span>").appendTo(line);
+		label.append(playerName(player.name));
+		if (player.teamName) label.append(document.createTextNode("· " + player.teamName));
 		line.on("click", function () {
 			location.hash = "player/" + player.id;
 		});
@@ -20,7 +22,7 @@ function renderPlayers() {
 function renderPlayer(player) {
 	const view = site.view;
 	const totals = aggregate(player.games, "PLAYER");
-	$("<span class='section-label'>").text(player.name).appendTo(view);
+	$("<span class='section-label'>").append(playerName(player.name)).appendTo(view);
 	const who = $("<div class='who'>").appendTo(view);
 	if (player.teamId) {
 		$("<div class='roster-line'>").text(player.teamName).appendTo(who).on("click", function () {

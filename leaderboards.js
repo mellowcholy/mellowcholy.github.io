@@ -51,7 +51,8 @@ function renderLeaderboards(hash) {
 			bindChampionTip(image, champion.name);
 			who.append(image);
 		}
-		who.append(document.createTextNode(row.player.name + (row.player.teamName ? " · " + row.player.teamName : "")));
+		who.append(playerName(row.player.name));
+		if (row.player.teamName) who.append(document.createTextNode("· " + row.player.teamName));
 		$("<span>").text(formatStat("PLAYER", board.key, row.value)).appendTo(line);
 		line.on("click", function () {
 			location.hash = "player/" + row.player.id;

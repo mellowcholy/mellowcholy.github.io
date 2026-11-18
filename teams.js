@@ -60,7 +60,9 @@ function renderTeam(team) {
 		const playedHere = player.games.filter(function (game) {
 			return game.teamId === team.id;
 		}).length;
-		$("<span>").text(player.name + " · " + (player.roleName || "flex") + " · " + playedHere + " games").appendTo(line);
+		const label = $("<span>").appendTo(line);
+		label.append(playerName(player.name));
+		label.append(document.createTextNode(" · " + (player.roleName || "flex") + " · " + playedHere + " games"));
 		line.on("click", function () {
 			location.hash = "player/" + player.id;
 		});
@@ -84,13 +86,14 @@ function renderTeam(team) {
 				bindChampionTip(image, member.champion.name);
 				line.append(image);
 			}
-			$("<span>").text(
-				member.name
-				+ (member.position ? " · " + member.position.name : "")
+			const label = $("<span>").appendTo(line);
+			label.append(playerName(member.name));
+			label.append(document.createTextNode(
+				(member.position ? " · " + member.position.name : "")
 				+ " · " + formatStat("PLAYER", "kills", member.stats.kills)
 				+ "/" + formatStat("PLAYER", "deaths", member.stats.deaths)
 				+ "/" + formatStat("PLAYER", "assists", member.stats.assists)
-			).appendTo(line);
+			));
 			line.on("click", function () {
 				location.hash = "player/" + member.playerId;
 			});

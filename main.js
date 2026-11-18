@@ -75,7 +75,7 @@ $(document).ready(async function () {
 
 	function renderPlayers() {
 		view.empty();
-		$("<span class='section-label'>").text("Players").appendTo(view);
+		$("<span class='section-label'>").text("Players - Click on a player to view more stats").appendTo(view);
 		model.players.forEach(function (player) {
 			const line = $("<div class='roster-line'>").appendTo(view);
 			const champion = mostPlayed(player.games, "champion");
@@ -158,7 +158,7 @@ $(document).ready(async function () {
 
 	function renderTeams() {
 		view.empty();
-		$("<span class='section-label'>").text("Teams").appendTo(view);
+		$("<span class='section-label'>").text("Teams - Click on a team to view more stats").appendTo(view);
 		model.teams.forEach(function (team) {
 			const line = $("<div class='roster-line'>").appendTo(view);
 			if (team.logoUrl) {

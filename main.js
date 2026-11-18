@@ -12,8 +12,6 @@ $(document).ready(async function () {
 	}
 
 	const model = buildModel(snapshot);
-	let sortKey = "kda";
-	let sortDir = -1;
 
 	$("#loading").css("display", "none");
 	renderNav();
@@ -26,16 +24,6 @@ $(document).ready(async function () {
 
 		addOption("players", "Players");
 		addOption("teams", "Teams");
-
-		$("<span class='section-label'>").text("Players").appendTo(left);
-		model.players.forEach(function (player) {
-			addOption("player/" + player.id, player.name);
-		});
-
-		$("<span class='section-label'>").text("Teams").appendTo(left);
-		model.teams.forEach(function (team) {
-			addOption("team/" + team.id, team.name);
-		});
 	}
 
 	function addOption(hash, text) {
@@ -48,9 +36,10 @@ $(document).ready(async function () {
 
 	function route() {
 		const hash = decodeURIComponent((location.hash || "#players").replace(/^#/, ""));
+		const section = hash.indexOf("player/") === 0 ? "players" : hash.indexOf("team/") === 0 ? "teams" : hash;
 		$(".option").removeClass("selected");
 		$(".option").filter(function () {
-			return $(this).attr("data-hash") === hash;
+			return $(this).attr("data-hash") === section;
 		}).addClass("selected");
 
 		view.empty();
@@ -86,79 +75,19 @@ $(document).ready(async function () {
 
 	function renderPlayers() {
 		view.empty();
-		const rows = model.players.map(function (player) {
-			const totals = aggregate(player.games, "PLAYER");
-			return { player: player, totals: totals };
-		});
-		rows.sort(function (a, b) {
-			return compareRows(a, b, sortKey, sortDir);
-		});
-
 		$("<span class='section-label'>").text("Players").appendTo(view);
-		const table = $("<table class='board'>").appendTo(view);
-		const head = $("<tr>").appendTo($("<thead>").appendTo(table));
-		column(head, "Player", "name", "left");
-		column(head, "Team", "team", "left");
-		column(head, "Role", "role", "left");
-		column(head, "G", "games");
-		column(head, "Series", "series");
-		column(head, "KDA", "kda");
-		column(head, "CS/m", "cs_per_minute");
-		column(head, "KP", "kill_participation");
-		column(head, "DMG/m", "damage_per_minute");
-		column(head, "VS/m", "vision_per_minute");
-
-		const body = $("<tbody>").appendTo(table);
-		rows.forEach(function (row) {
-			const player = row.player;
-			const totals = row.totals;
-			const tr = $("<tr>").appendTo(body);
-			const nameCell = $("<td class='left'>").appendTo(tr);
+		model.players.forEach(function (player) {
+			const line = $("<div class='roster-line'>").appendTo(view);
 			const champion = mostPlayed(player.games, "champion");
 			if (champion) {
 				const image = icon(champion, "champ");
 				bindChampionTip(image, champion.name);
-				nameCell.append(image);
+				line.append(image);
 			}
-			nameCell.append(document.createTextNode(" " + player.name));
-			const teamCell = $("<td class='left'>").text(player.teamName || "").appendTo(tr);
-			$("<td class='left'>").text(player.roleName || "").appendTo(tr);
-			$("<td>").text(player.games.length).appendTo(tr);
-			$("<td>").text(player.seriesWins + "-" + player.seriesLosses).appendTo(tr);
-			$("<td>").text(formatStat("PLAYER", "kda", totals.kda)).appendTo(tr);
-			$("<td>").text(formatStat("PLAYER", "cs_per_minute", totals.cs_per_minute)).appendTo(tr);
-			$("<td>").text(formatStat("PLAYER", "kill_participation", totals.kill_participation)).appendTo(tr);
-			$("<td>").text(formatStat("PLAYER", "damage_per_minute", totals.damage_per_minute)).appendTo(tr);
-			$("<td>").text(formatStat("PLAYER", "vision_per_minute", totals.vision_per_minute)).appendTo(tr);
-
-			tr.on("click", function () {
+			$("<span>").text(player.name + (player.teamName ? " · " + player.teamName : "")).appendTo(line);
+			line.on("click", function () {
 				location.hash = "player/" + player.id;
 			});
-			teamCell.on("click", function (event) {
-				event.stopPropagation();
-				if (player.teamId) {
-					location.hash = "team/" + player.teamId;
-				}
-			});
-		});
-	}
-
-	function column(head, label, key, className) {
-		const th = $("<th>").text(label + (sortKey === key ? (sortDir < 0 ? " v" : " ^") : "")).appendTo(head);
-		if (className) {
-			th.addClass(className);
-		}
-		if (sortKey === key) {
-			th.addClass("selected");
-		}
-		th.on("click", function () {
-			if (sortKey === key) {
-				sortDir = -sortDir;
-			} else {
-				sortKey = key;
-				sortDir = key === "name" || key === "team" || key === "role" ? 1 : -1;
-			}
-			renderPlayers();
 		});
 	}
 
@@ -228,21 +157,17 @@ $(document).ready(async function () {
 	}
 
 	function renderTeams() {
+		view.empty();
 		$("<span class='section-label'>").text("Teams").appendTo(view);
 		model.teams.forEach(function (team) {
-			const block = $("<div class='match-line'>").appendTo(view);
-			const title = $("<div class='roster-line'>").appendTo(block);
+			const line = $("<div class='roster-line'>").appendTo(view);
 			if (team.logoUrl) {
-				title.append(icon({ imageUrl: team.logoUrl, name: team.name }, "champ"));
+				line.append(icon({ imageUrl: team.logoUrl, name: team.name }, "champ"));
 			}
-			$("<span>").text(team.name + "  " + team.seriesWins + "-" + team.seriesLosses).appendTo(title);
-			title.on("click", function () {
+			$("<span>").text(team.name).appendTo(line);
+			line.on("click", function () {
 				location.hash = "team/" + team.id;
 			});
-			const roster = team.roster.map(function (player) {
-				return player.name;
-			}).join(", ");
-			$("<span class='muted'>").text(roster || "No played games").appendTo(block);
 		});
 	}
 
@@ -388,29 +313,6 @@ $(document).ready(async function () {
 	function hideTip() {
 		tooltip.hide();
 		tooltip.text("");
-	}
-
-	function compareRows(a, b, key, dir) {
-		const av = sortValue(a, key);
-		const bv = sortValue(b, key);
-		if (typeof av === "string" || typeof bv === "string") {
-			return String(av).localeCompare(String(bv)) * dir;
-		}
-		const an = av == null || Number.isNaN(av) ? (dir < 0 ? -Infinity : Infinity) : av;
-		const bn = bv == null || Number.isNaN(bv) ? (dir < 0 ? -Infinity : Infinity) : bv;
-		if (an === bn) {
-			return a.player.name.localeCompare(b.player.name);
-		}
-		return an < bn ? -dir : dir;
-	}
-
-	function sortValue(row, key) {
-		if (key === "name") return row.player.name;
-		if (key === "team") return row.player.teamName || "";
-		if (key === "role") return row.player.roleName || "";
-		if (key === "games") return row.player.games.length;
-		if (key === "series") return row.player.seriesWins - row.player.seriesLosses;
-		return row.totals[key];
 	}
 
 	const floating = {

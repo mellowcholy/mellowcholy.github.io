@@ -265,3 +265,8 @@ table.board img {
 	background-color: white;
 	color: black;
 }
+
+#view {
+	outline: 1px grey solid;
+	padding: 12px;
+}

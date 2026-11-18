@@ -75,6 +75,45 @@ body {
 	user-select: text;
 }
 
+#view.split {
+	overflow: hidden;
+}
+
+#board {
+	display: flex;
+	align-items: flex-start;
+	height: 100%;
+}
+
+#board-nav {
+	width: 30%;
+	height: 100%;
+	min-width: 0;
+	overflow-y: auto;
+	margin-right: 3%;
+}
+
+#board-main {
+	width: 67%;
+	height: 100%;
+	min-width: 0;
+	overflow: auto;
+}
+
+.rank-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+	padding: 2px 0;
+}
+
+.rank-line:hover {
+	background-color: white;
+	color: black;
+}
+
 .option {
 	margin-top: 0.5vh;
 	margin-bottom: 0.5vh;

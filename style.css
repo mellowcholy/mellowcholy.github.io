@@ -103,10 +103,18 @@ body {
 .rank-line {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
 	gap: 12px;
 	cursor: pointer;
 	padding: 2px 0;
+}
+
+.rank-line span {
+	display: flex;
+	align-items: center;
+}
+
+.rank-line img {
+	margin-right: 8px;
 }
 
 .rank-line:hover {

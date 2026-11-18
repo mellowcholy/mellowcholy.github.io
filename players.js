@@ -52,34 +52,13 @@ function renderPlayer(player) {
 	headlineStat(headline, "Win rate", formatStat("PLAYER", "win_rate", totals.win_rate));
 
 	$("<span class='section-label'>").text("Season").appendTo(view);
-	renderStatGroups("PLAYER", totals);
-
-	$("<span class='section-label'>").text("Games").appendTo(view);
-	if (!player.games.length) {
-		$("<span class='muted'>").text("No played games.").appendTo(view);
-		return;
-	}
-	player.games.forEach(function (game) {
-		const block = $("<div class='game'>").appendTo(view);
-		$("<div>").text(gameTitle(game)).appendTo(block);
-		const row = $("<div class='champ-row'>").appendTo(block);
-		if (game.champion) {
-			const image = icon(game.champion, "champ");
-			bindChampionTip(image, game.champion.name);
-			row.append(image);
-		}
-		$("<span>").text(
-			(game.champion ? game.champion.name : "Unknown")
-			+ (game.position ? " · " + game.position.name : "")
-		).appendTo(row);
-		if (game.items.length) {
-			const items = $("<div class='champ-row'>").appendTo(block);
-			game.items.forEach(function (item) {
-				const image = icon(item, "champ item");
-				bindChampionTip(image, item.name);
-				items.append(image);
-			});
-		}
-		renderStatGroups("PLAYER", game.stats, block);
+	const played = totals.games || 0;
+	const won = totals.wins || 0;
+	renderStatGroups("PLAYER", totals, null, {
+		Results: [
+			{ label: "Games played", value: played },
+			{ label: "Games won", value: won },
+			{ label: "Games lost", value: played - won },
+		],
 	});
 }

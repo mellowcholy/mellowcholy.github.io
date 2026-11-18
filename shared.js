@@ -4,7 +4,7 @@ var site = {
 	tooltip: null,
 };
 
-function renderStatGroups(scope, values, parent) {
+function renderStatGroups(scope, values, parent, extras) {
 	const host = $("<div class='stats'>").appendTo(parent || site.view);
 	const groups = {};
 	site.model.definitions.filter(function (definition) {
@@ -21,6 +21,11 @@ function renderStatGroups(scope, values, parent) {
 		$("<span class='group-title'>").text(name).appendTo(group);
 		groups[name].sort(function (a, b) {
 			return (a.position || 0) - (b.position || 0);
+		});
+		(extras && extras[name] || []).forEach(function (extra) {
+			const row = $("<div class='stat-row'>").appendTo(group);
+			$("<span>").text(extra.label).appendTo(row);
+			$("<span>").text(extra.value).appendTo(row);
 		});
 		groups[name].forEach(function (definition) {
 			let value = values[definition.statKey];

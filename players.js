@@ -6,8 +6,9 @@ function renderPlayers() {
 		const team = (a.teamName || "").localeCompare(b.teamName || "");
 		if (team) return team;
 		return a.name.localeCompare(b.name);
-	}).forEach(function (player) {
+	}).forEach(function (player, index) {
 		const line = $("<div class='roster-line'>").appendTo(view);
+		if (index % 2 === 1) line.addClass("row-alt");
 		const champion = mostPlayed(player.games, "champion");
 		if (champion) {
 			const image = icon(champion, "champ");

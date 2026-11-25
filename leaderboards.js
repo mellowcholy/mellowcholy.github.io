@@ -56,8 +56,9 @@ function renderLeaderboards(hash) {
 		renderChampionBoard(main, board);
 		return;
 	}
-	ranked(board).forEach(function (row) {
+	ranked(board).forEach(function (row, index) {
 		const line = $("<div class='rank-line'>").appendTo(main);
+		if (index % 2 === 1) line.addClass("row-alt");
 		const who = $("<span>").appendTo(line);
 		const champion = board.mode === "best" ? row.champion : mostPlayed(row.player.games, "champion");
 		if (champion) {
@@ -80,8 +81,9 @@ function renderChampionBoard(main, board) {
 		$("<span class='muted'>").text(board.stat === "bans" ? "No bans recorded." : "No champion games recorded.").appendTo(main);
 		return;
 	}
-	rows.forEach(function (row) {
+	rows.forEach(function (row, index) {
 		const line = $("<div class='rank-line'>").appendTo(main);
+		if (index % 2 === 1) line.addClass("row-alt");
 		const who = $("<span>").appendTo(line);
 		const image = icon(row.champion, "champ");
 		bindChampionTip(image, row.champion.name);

@@ -2,8 +2,9 @@ function renderTeams() {
 	const view = site.view;
 	view.empty();
 	$("<span class='section-label'>").text("Teams - Click on a team to view more stats").appendTo(view);
-	site.model.teams.forEach(function (team) {
+	site.model.teams.forEach(function (team, index) {
 		const line = $("<div class='roster-line'>").appendTo(view);
+		if (index % 2 === 1) line.addClass("row-alt");
 		if (team.logoUrl) {
 			line.append(icon({ imageUrl: team.logoUrl, name: team.name }, "champ"));
 		}

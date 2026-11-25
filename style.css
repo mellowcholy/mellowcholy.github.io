@@ -1,7 +1,7 @@
 body {
   background-color: black;
   color: white;
-  font-family: 'MS PGothic', 'ＭＳ Ｐゴシック', Georgia, Arial, Helvetica, sans-serif;
+  font-family: 'MS PGothic', 'ＭＳ Ｐゴシック', 'Hiragino Kaku Gothic Pro', Georgia, Arial, Helvetica, sans-serif;
 
   user-select: none;
 }

@@ -50,20 +50,18 @@ function renderTeam(team) {
 	}
 	team.roster.forEach(function (player) {
 		const line = $("<div class='roster-line'>").appendTo(view);
-		const champion = mostPlayed(player.games.filter(function (game) {
+		const playedHere = player.games.filter(function (game) {
 			return game.teamId === team.id;
-		}), "champion");
+		});
+		const champion = representativeChampion(player, playedHere);
 		if (champion) {
 			const image = icon(champion, "champ");
 			bindChampionTip(image, champion.name);
 			line.append(image);
 		}
-		const playedHere = player.games.filter(function (game) {
-			return game.teamId === team.id;
-		}).length;
 		const label = $("<span>").appendTo(line);
 		label.append(playerName(player.name));
-		label.append(document.createTextNode(" · " + (player.roleName || "flex") + " · " + playedHere + " games"));
+		label.append(document.createTextNode(" · " + (player.roleName || "flex") + " · " + playedHere.length + " games"));
 		line.on("click", function () {
 			location.hash = "player/" + player.id;
 		});

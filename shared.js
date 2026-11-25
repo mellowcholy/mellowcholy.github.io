@@ -532,6 +532,25 @@ function mostPlayed(games, field) {
 	return ranked.length ? ranked[0].item : null;
 }
 
+function representativeChampion(player, games) {
+	if (player && player.name === "mellowcholy") {
+		const yunara = findChampion("Yunara");
+		if (yunara) return yunara;
+	}
+	return mostPlayed(games, "champion");
+}
+
+function findChampion(name) {
+	let found = null;
+	(site.model.players || []).forEach(function (player) {
+		if (found) return;
+		player.games.forEach(function (game) {
+			if (!found && game.champion && game.champion.name === name) found = game.champion;
+		});
+	});
+	return found;
+}
+
 function countBy(games, field) {
 	const counts = {};
 	games.forEach(function (game) {

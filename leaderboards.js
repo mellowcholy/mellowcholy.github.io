@@ -59,7 +59,7 @@ function renderLeaderboards(hash) {
 		if (index % 2 === 1) line.addClass("row-alt");
 		const who = $("<span>").appendTo(line);
 		markRank(line, who, index);
-		const champion = board.mode === "best" ? row.champion : mostPlayed(row.player.games, "champion");
+		const champion = board.mode === "best" ? row.champion : representativeChampion(row.player, row.player.games);
 		if (champion) {
 			const image = icon(champion, "champ");
 			bindChampionTip(image, champion.name);

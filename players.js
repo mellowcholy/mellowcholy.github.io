@@ -9,7 +9,7 @@ function renderPlayers() {
 	}).forEach(function (player, index) {
 		const line = $("<div class='roster-line'>").appendTo(view);
 		if (index % 2 === 1) line.addClass("row-alt");
-		const champion = mostPlayed(player.games, "champion");
+		const champion = representativeChampion(player, player.games);
 		if (champion) {
 			const image = icon(champion, "champ");
 			bindChampionTip(image, champion.name);

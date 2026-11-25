@@ -89,7 +89,7 @@ function hideTip() {
 	site.tooltip.text("");
 }
 
-function buildModel(snapshot) {
+function buildModel(snapshot, playerConfig) {
 	const definitions = snapshot.definitions || [];
 	const definitionMap = {};
 	definitions.forEach(function (definition) {
@@ -181,9 +181,15 @@ function buildModel(snapshot) {
 				};
 				player.games.push(record);
 				if (!player.seriesIds[match.id]) {
-					player.seriesIds[match.id] = true;
-					if (side.winner) player.seriesWins += 1;
-					else if (side.result === "LOSS") player.seriesLosses += 1;
+					if (side.winner) {
+						player.seriesIds[match.id] = "W";
+						player.seriesWins += 1;
+					} else if (side.result === "LOSS") {
+						player.seriesIds[match.id] = "L";
+						player.seriesLosses += 1;
+					} else {
+						player.seriesIds[match.id] = "";
+					}
 				}
 				player.teamCounts[teamId] = player.teamCounts[teamId] || { id: teamId, name: side.name || "", games: 0 };
 				player.teamCounts[teamId].games += 1;
@@ -225,13 +231,16 @@ function buildModel(snapshot) {
 		player.games.sort(function (a, b) {
 			return String(a.playedAt).localeCompare(String(b.playedAt)) || (a.gameIndex || 0) - (b.gameIndex || 0);
 		});
-		const team = favoriteTeam(player);
-		player.teamId = team ? team.id : null;
-		player.teamName = team ? team.name : "";
-		const role = mostPlayed(player.games, "position");
-		player.roleName = role ? role.name : "";
+		assignPlayerTeam(player);
 		return player;
-	}).sort(function (a, b) {
+	});
+	const playerAlias = {};
+	applyPlayerIds(playerById, teamById, playerConfig, playerAlias);
+	players.length = 0;
+	Object.keys(playerById).forEach(function (id) {
+		players.push(playerById[id]);
+	});
+	players.sort(function (a, b) {
 		return a.name.localeCompare(b.name);
 	});
 
@@ -262,9 +271,97 @@ function buildModel(snapshot) {
 		definitionMap: definitionMap,
 		players: players,
 		playerById: playerById,
+		playerAlias: playerAlias,
 		teams: teams,
 		teamById: teamById,
 	};
+}
+
+function assignPlayerTeam(player) {
+	const team = favoriteTeam(player);
+	player.teamId = team ? team.id : null;
+	player.teamName = team ? team.name : "";
+	const role = mostPlayed(player.games, "position");
+	player.roleName = role ? role.name : "";
+}
+
+function applyPlayerIds(playerById, teamById, config, playerAlias) {
+	const entries = (config && config.players) || [];
+	const claimed = {};
+	entries.forEach(function (entry) {
+		if (!entry) return;
+		const name = String(entry.username || entry.id || "").trim();
+		if (!name) return;
+		const accounts = (entry.accounts || []).map(function (account) {
+			return String(account || "").trim();
+		}).filter(Boolean);
+		const matches = [];
+		Object.keys(playerById).forEach(function (id) {
+			const player = playerById[id];
+			if (!player || claimed[player.id]) return;
+			const linked = accounts.some(function (account) {
+				return account === player.id || account === player.name;
+			});
+			if (linked) matches.push(player);
+		});
+		if (!matches.length) return;
+		const taken = playerById[name];
+		if (taken && matches.indexOf(taken) === -1) return;
+
+		const combined = {
+			id: name,
+			name: name,
+			games: [],
+			seriesIds: {},
+			seriesWins: 0,
+			seriesLosses: 0,
+			teamCounts: {},
+		};
+		matches.forEach(function (player) {
+			claimed[player.id] = true;
+			player.games.forEach(function (game) {
+				game.playerId = name;
+				game.name = name;
+				combined.games.push(game);
+			});
+			Object.keys(player.seriesIds).forEach(function (matchId) {
+				if (combined.seriesIds[matchId]) return;
+				combined.seriesIds[matchId] = player.seriesIds[matchId];
+			});
+			Object.keys(player.teamCounts).forEach(function (teamId) {
+				const count = player.teamCounts[teamId];
+				const existing = combined.teamCounts[teamId] || { id: teamId, name: count.name, games: 0 };
+				if (count.name) existing.name = count.name;
+				existing.games += count.games;
+				combined.teamCounts[teamId] = existing;
+			});
+		});
+		Object.keys(combined.seriesIds).forEach(function (matchId) {
+			if (combined.seriesIds[matchId] === "W") combined.seriesWins += 1;
+			else if (combined.seriesIds[matchId] === "L") combined.seriesLosses += 1;
+		});
+		combined.games.sort(function (a, b) {
+			return String(a.playedAt).localeCompare(String(b.playedAt)) || (a.gameIndex || 0) - (b.gameIndex || 0);
+		});
+		assignPlayerTeam(combined);
+		matches.forEach(function (player) {
+			if (player.id !== name) playerAlias[player.id] = combined;
+			if (player.name && player.name !== name) playerAlias[player.name] = combined;
+			delete playerById[player.id];
+		});
+		playerById[name] = combined;
+		Object.keys(teamById).forEach(function (teamId) {
+			const rosterIds = teamById[teamId].rosterIds;
+			let present = false;
+			matches.forEach(function (player) {
+				if (rosterIds[player.id]) {
+					present = true;
+					delete rosterIds[player.id];
+				}
+			});
+			if (present) rosterIds[name] = true;
+		});
+	});
 }
 
 function aggregate(games, scope) {

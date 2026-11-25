@@ -4,14 +4,20 @@ $(document).ready(async function () {
 	site.tooltip = $("#tooltip");
 
 	let snapshot;
+	let playerConfig = { players: [] };
 	try {
 		snapshot = await $.getJSON("data/tournament.json?t=" + Date.now());
 	} catch (error) {
 		$("#loading").text("could not load stats");
 		return;
 	}
+	try {
+		playerConfig = await $.getJSON("data/players.json?t=" + Date.now());
+	} catch (error) {
+		playerConfig = { players: [] };
+	}
 
-	site.model = buildModel(snapshot);
+	site.model = buildModel(snapshot, playerConfig);
 	$("#loading").css("display", "none");
 
 	const floating = {
@@ -69,9 +75,15 @@ $(document).ready(async function () {
 			return;
 		}
 		if (hash.indexOf("player/") === 0) {
-			const player = site.model.playerById[hash.slice("player/".length)];
+			const id = hash.slice("player/".length);
+			const player = site.model.playerById[id];
 			if (player) {
 				renderPlayer(player);
+				return;
+			}
+			const alias = site.model.playerAlias[id];
+			if (alias) {
+				location.hash = "player/" + alias.id;
 				return;
 			}
 		}

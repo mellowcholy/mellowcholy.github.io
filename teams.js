@@ -73,7 +73,7 @@ function renderTeam(team) {
 		$("<span class='muted'>").text("No played games.").appendTo(view);
 		return;
 	}
-	renderStatGroups("TEAM", totals);
+	renderStatGroups("TEAM", totals, null, null, true);
 
 	$("<span class='section-label'>").text("Games").appendTo(view);
 	team.games.forEach(function (game) {

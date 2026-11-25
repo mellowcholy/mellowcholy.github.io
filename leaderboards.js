@@ -60,6 +60,7 @@ function renderLeaderboards(hash) {
 		const line = $("<div class='rank-line'>").appendTo(main);
 		if (index % 2 === 1) line.addClass("row-alt");
 		const who = $("<span>").appendTo(line);
+		markRank(line, who, index);
 		const champion = board.mode === "best" ? row.champion : mostPlayed(row.player.games, "champion");
 		if (champion) {
 			const image = icon(champion, "champ");
@@ -75,6 +76,11 @@ function renderLeaderboards(hash) {
 	});
 }
 
+function markRank(line, who, index) {
+	if (index < 3) line.addClass("rank-top");
+	$("<span class='rank-place'>").text((index + 1) + ".").prependTo(who);
+}
+
 function renderChampionBoard(main, board) {
 	const rows = championRows(board);
 	if (!rows.length) {
@@ -85,6 +91,7 @@ function renderChampionBoard(main, board) {
 		const line = $("<div class='rank-line'>").appendTo(main);
 		if (index % 2 === 1) line.addClass("row-alt");
 		const who = $("<span>").appendTo(line);
+		markRank(line, who, index);
 		const image = icon(row.champion, "champ");
 		bindChampionTip(image, row.champion.name);
 		who.append(image);

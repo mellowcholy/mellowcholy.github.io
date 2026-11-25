@@ -110,7 +110,20 @@ body {
 	justify-content: space-between;
 	gap: 12px;
 	cursor: pointer;
-	padding: 2px 0;
+	padding: 2px 8px;
+	font-size: 12px;
+}
+
+.rank-top {
+	font-size: 16px;
+}
+
+.rank-place {
+	margin-right: 8px;
+}
+
+.rank-top .rank-place {
+	font-weight: bold;
 }
 
 .rank-line span {
@@ -120,6 +133,16 @@ body {
 
 .rank-line img {
 	margin-right: 8px;
+}
+
+.rank-line img.champ {
+	width: 32px;
+	height: 32px;
+}
+
+.rank-top img.champ {
+	width: 50px;
+	height: 50px;
 }
 
 .rank-line:hover {

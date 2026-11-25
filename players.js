@@ -2,7 +2,11 @@ function renderPlayers() {
 	const view = site.view;
 	view.empty();
 	$("<span class='section-label'>").text("Players - Click on a player to view more stats").appendTo(view);
-	site.model.players.forEach(function (player) {
+	site.model.players.slice().sort(function (a, b) {
+		const team = (a.teamName || "").localeCompare(b.teamName || "");
+		if (team) return team;
+		return a.name.localeCompare(b.name);
+	}).forEach(function (player) {
 		const line = $("<div class='roster-line'>").appendTo(view);
 		const champion = mostPlayed(player.games, "champion");
 		if (champion) {

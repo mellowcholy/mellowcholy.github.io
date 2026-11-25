@@ -21,8 +21,6 @@ const boards = [
 	{ id: "vision_per_minute", label: "Vision per minute", group: "Other", key: "vision_per_minute" },
 
 	{ id: "champ_picks", label: "Most picked", group: "Champions", kind: "champion", stat: "picks" },
-	{ id: "champ_bans", label: "Most banned", group: "Champions", kind: "champion", stat: "bans" },
-	{ id: "champ_presence", label: "Highest presence", group: "Champions", kind: "champion", stat: "presence" },
 	{ id: "champ_win_rate", label: "Highest win rate", group: "Champions", kind: "champion", stat: "winRate" },
 	{ id: "champ_kda", label: "Highest KDA", group: "Champions", kind: "champion", stat: "kda" },
 	{ id: "champ_kills", label: "Most kills", group: "Champions", kind: "champion", stat: "kills" },
@@ -84,7 +82,7 @@ function markRank(line, who, index) {
 function renderChampionBoard(main, board) {
 	const rows = championRows(board);
 	if (!rows.length) {
-		$("<span class='muted'>").text(board.stat === "bans" ? "No bans recorded." : "No champion games recorded.").appendTo(main);
+		$("<span class='muted'>").text("No champion games recorded.").appendTo(main);
 		return;
 	}
 	rows.forEach(function (row, index) {
@@ -102,8 +100,6 @@ function renderChampionBoard(main, board) {
 
 function championRows(board) {
 	return championStats().filter(function (row) {
-		if (board.stat === "bans") return row.bans > 0;
-		if (board.stat === "presence") return row.presence > 0;
 		return row.picks > 0;
 	}).sort(function (a, b) {
 		const av = championValue(a, board);
@@ -120,7 +116,6 @@ function championValue(row, board) {
 	if (board.stat === "winRate") return row.winRate;
 	if (board.stat === "kda") return row.kda;
 	if (board.stat === "dpm") return row.dpm;
-	if (board.stat === "presence") return row.presence;
 	return row[board.stat] || 0;
 }
 
@@ -141,7 +136,6 @@ function championStats() {
 				champion: champion,
 				picks: 0,
 				wins: 0,
-				bans: 0,
 				kills: 0,
 				deaths: 0,
 				assists: 0,
@@ -164,17 +158,8 @@ function championStats() {
 			row.minutes += (game.stats.time_played || 0) / 60000;
 		});
 	});
-	site.model.teams.forEach(function (team) {
-		team.games.forEach(function (game) {
-			(game.bans || []).forEach(function (ban) {
-				const row = ensure(ban);
-				if (row) row.bans += 1;
-			});
-		});
-	});
 	return Object.keys(champs).map(function (key) {
 		const row = champs[key];
-		row.presence = row.picks + row.bans;
 		row.winRate = row.picks ? row.wins / row.picks * 100 : 0;
 		row.kda = row.deaths ? (row.kills + row.assists) / row.deaths : (row.kills + row.assists);
 		row.dpm = row.minutes ? row.damage / row.minutes : 0;
